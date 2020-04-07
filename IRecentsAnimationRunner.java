@@ -21,12 +21,16 @@ public interface IRecentsAnimationRunner extends IInterface {
 
         public void onAnimationStart(IRecentsAnimationController iRecentsAnimationController, RemoteAnimationTarget[] remoteAnimationTargetArr, Rect rect, Rect rect2) throws RemoteException {
         }
+
+        public void reportAllDrawn() throws RemoteException {
+        }
     }
 
     public static abstract class Stub extends Binder implements IRecentsAnimationRunner {
         private static final String DESCRIPTOR = "android.view.IRecentsAnimationRunner";
         static final int TRANSACTION_onAnimationCanceled = 2;
         static final int TRANSACTION_onAnimationStart = 3;
+        static final int TRANSACTION_reportAllDrawn = 4;
 
         private static class Proxy implements IRecentsAnimationRunner {
             public static IRecentsAnimationRunner sDefaultImpl;
@@ -86,6 +90,20 @@ public interface IRecentsAnimationRunner extends IInterface {
                     obtain.recycle();
                 }
             }
+
+            public void reportAllDrawn() throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                try {
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (this.mRemote.transact(4, obtain, (Parcel) null, 1) || Stub.getDefaultImpl() == null) {
+                        obtain.recycle();
+                    } else {
+                        Stub.getDefaultImpl().reportAllDrawn();
+                    }
+                } finally {
+                    obtain.recycle();
+                }
+            }
         }
 
         public Stub() {
@@ -108,10 +126,13 @@ public interface IRecentsAnimationRunner extends IInterface {
             if (i == 2) {
                 return "onAnimationCanceled";
             }
-            if (i != 3) {
+            if (i == 3) {
+                return "onAnimationStart";
+            }
+            if (i != 4) {
                 return null;
             }
-            return "onAnimationStart";
+            return "reportAllDrawn";
         }
 
         public static boolean setDefaultImpl(IRecentsAnimationRunner iRecentsAnimationRunner) {
@@ -139,6 +160,10 @@ public interface IRecentsAnimationRunner extends IInterface {
                 parcel.enforceInterface(DESCRIPTOR);
                 onAnimationStart(IRecentsAnimationController.Stub.asInterface(parcel.readStrongBinder()), (RemoteAnimationTarget[]) parcel.createTypedArray(RemoteAnimationTarget.CREATOR), parcel.readInt() != 0 ? Rect.CREATOR.createFromParcel(parcel) : null, parcel.readInt() != 0 ? Rect.CREATOR.createFromParcel(parcel) : null);
                 return true;
+            } else if (i == 4) {
+                parcel.enforceInterface(DESCRIPTOR);
+                reportAllDrawn();
+                return true;
             } else if (i != 1598968902) {
                 return super.onTransact(i, parcel, parcel2, i2);
             } else {
@@ -153,4 +178,6 @@ public interface IRecentsAnimationRunner extends IInterface {
 
     @UnsupportedAppUsage
     void onAnimationStart(IRecentsAnimationController iRecentsAnimationController, RemoteAnimationTarget[] remoteAnimationTargetArr, Rect rect, Rect rect2) throws RemoteException;
+
+    void reportAllDrawn() throws RemoteException;
 }
